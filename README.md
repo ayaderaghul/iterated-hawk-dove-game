@@ -1,8 +1,8 @@
 # iterated hawk dove game
 
-*im sorry i dont have a just-work version of the code, but you may try to read, it's readable.
+*im sorry i dont have a just-work version of the code, but you may try to read, it's readable.*
 
-or at least see the png file, they are results i run at small scales*
+*or at least see the png file, they are results i run at small scales*
 
 in the iterated hawk dove game, agents condition their strategy on the previous round. for now, there are 5 given types: hawk, dove, tit for tat, cautious tit for tat, win stay lose shift (pavlov).
 
