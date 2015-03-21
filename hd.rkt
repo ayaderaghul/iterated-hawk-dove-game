@@ -18,11 +18,18 @@
 (define (vector-rest a-vector)
   (vector-drop a-vector 1))
 
-(define (h) (vector 1 1 (list 1 1 1 1))) ; the second is the previous strat
-(define (d) (vector 0 0 (list 0 0 0 0)))
-(define (tft) (vector 0 0 (list 1 0 1 0)))
-(define (ctft) (vector 1 1 (list 1 0 1 0)))
-(define (wsls) (vector 1 1 (list 0 1 0 1))) ; the pavlov guy
+;; 1 = playing hawk
+;; 0 = playing dove
+;; the first number is the initial strategy
+;; the second number is the previous strategy
+;; the list is the switching strategy rule
+;; outcome HH HD DH DD
+
+(define (h) (vector 1 1 (list 1 1 1 1))) ; always hawk
+(define (d) (vector 0 0 (list 0 0 0 0))) ; always dove
+(define (tft) (vector 0 0 (list 1 0 1 0))) ; tit for tat
+(define (ctft) (vector 1 1 (list 1 0 1 0))) ; cautious tit for tat
+(define (wsls) (vector 1 1 (list 0 1 0 1))) ; the pavlov guy =))
 
 (define 5-type-list (list (h) (d) (tft) (ctft) (wsls)))
 
@@ -118,7 +125,7 @@
 ;; create a world of p slots
 (define (create-world p)
   (for/vector ([i p]) 0))
-(define N 1000)
+(define N 100)
 (define A (create-world N)) ; A is population
 (define B (create-world N)) ; B is payoff book
 (define B+ (create-world N)) ; B+ is the positive payoff book
@@ -318,7 +325,7 @@
 
 ;; TV
 (define demographic-frame (new frame% [label "population demographic over time"]
-                           [width 400]
+                           [width 600]
                            [height 400]))
 (define demo-canvas (new canvas% [parent demographic-frame]))
 (define dc-demo (send demo-canvas get-dc))
@@ -348,19 +355,19 @@
     (plot/dc (list
               (lines h-series
                      #:x-min 0 #:x-max 1000
-                     #:y-min 0 #:y-max 1000 #:color 1)
+                     #:y-min 0 #:y-max N #:color 1 #:label "h")
               (lines d-series
-                     #:color 2)
+                     #:color 2 #:label "d")
               (lines t-series
-                     #:color 3)
+                     #:color 3 #:label "t4t")
               (lines c-series
-                     #:color 4)
+                     #:color 4 #:label "ct4t")
               (lines w-series
-                     #:color 5)
+                     #:color 6 #:label "pavlov :D")
               )
              dc-demo
              0 0
-             400 400)))
+             600 400)))
 
 
 ;;create population A at ratio...
