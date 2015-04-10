@@ -9,14 +9,27 @@
 (define-struct automaton (init-claim hh hd dh dd))
 
 (define all-hawks (make-automaton 1 1 1 1 1))
-(define accommodator (make-automaton 1 0 1 0 1))
-(define tit-for-tat (make-automaton 0 1 0 1 0))
+
+;; tit for tat alternates with tough-tweedle-dee
+(define cautious-tft (make-automaton 1 1 0 1 0))
+(define tit-for-tat (make-automaton 0 1 0 1 0)) ;
 (define all-doves (make-automaton 0 0 0 0 0))
 (define grim-trigger (make-automaton 0 1 1 1 0))
-(define silly-dove (make-automaton 0 0 1 1 0))
-(define tweedle-dum (make-automaton 0 1 0 0 0))
-(define tweedle-dee (make-automaton 0 0 0 1 0))
+(define pavlov (make-automaton 0 0 1 1 0)) ;
+(define tweedle-dum (make-automaton 0 1 0 0 0)) ; useless
+(define tweedle-dee (make-automaton 0 0 0 1 0)) ;
+(define tough-tweedle-dee (make-automaton 1 0 0 1 0)) ;
+(define tough-pavlov (make-automaton 1 0 1 1 0)) ;
 
+(define alternator (make-automaton 0 0 0 1 1))
+(define tough-alternator (make-automaton 1 0 0 1 1))
+
+(define contestants
+  (list all-hawks
+        tit-for-tat all-doves
+        grim-trigger pavlov
+        tweedle-dum tweedle-dee tough-tweedle-dee
+        tough-pavlov alternator tough-alternator))
 (define (make-population type-list type-number)
   (shuffle
    (flatten
@@ -24,13 +37,9 @@
       (make-list (list-ref type-number i) (list-ref type-list i))))))
 
 
-(define contestants
-  (list all-hawks accommodator
-        tit-for-tat all-doves
-        grim-trigger silly-dove))
 
 (define (contest automaton contestant-list)
-  (map (lambda (x) (take-sums (match-pair (list automaton x) 50)))
+  (map (lambda (x) (match-pair (list automaton x) 10))
        contestant-list))
 
 ;; 1 = playing hawk
@@ -210,6 +219,7 @@
              (list-ref top-list i))))))
 
 (define population-mean (list 0))
+(define payoff-space (list 0))
 
 (define (rank-payoff criterion population rounds-per-match)
   (let ([payoff-list (flatten (match-population population rounds-per-match))])
@@ -217,8 +227,8 @@
 
 (define (evolve population cycles speed rounds-per-match)
   (let* ([l (length population)]
-         [round-results (flatten (match-population population rounds-per-match))]
-         [accum-fitness (accumulate (payoff-percentages round-results))]
+         [round-results (match-population population rounds-per-match)]
+         [accum-fitness (accumulate (payoff-percentages (flatten round-results)))]
          [survivors (drop population speed)]
          [successors
           (randomise-over-fitness accum-fitness population speed)]
@@ -228,10 +238,12 @@
     (set! population-mean
           (append population-mean (list
                                    (exact->inexact
-                                    (/ (sum round-results)
+                                    (/ (sum (flatten round-results))
                                        (* l rounds-per-match))))))
     (if (zero? cycles)
-        population
+        (begin
+          (set! payoff-space round-results)
+          population)
         (evolve new-population (sub1 cycles) speed rounds-per-match)
         )))
 
@@ -260,6 +272,14 @@
                     #:y-min 0 #:y-max 11)
              dynamic-dc
              0 0 400 400)))
+
+(define (plot-payoff-space pay-list)
+  (plot/dc (points pay-list
+                   #:x-min -60 #:x-max 220
+                   #:y-min -60 #:y-max 220)
+           dynamic-dc
+           0 0
+           400 400))
 
 ;; data:
 ;; '((1 2..)
