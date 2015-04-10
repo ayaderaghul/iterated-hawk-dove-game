@@ -269,7 +269,7 @@
                      data)])
     (plot/dc (lines coors
                     #:x-min 0 #:x-max l
-                    #:y-min 0 #:y-max 11)
+                    #:y-min 0 #:y-max 5)
              dynamic-dc
              0 0 400 400)))
 
